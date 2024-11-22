@@ -158,4 +158,13 @@ h1{
       transform: scale(0.9);
     }
   }
-  
+.twitter-tweet{ margin-left: auto;
+    margin-right: auto;
+
+}
+p2 {
+    font-family: 'Boohong', cursive;
+    font-size: 1.2rem;
+    color: rgb(234, 211, 8);
+    text-align: center;
+}  
