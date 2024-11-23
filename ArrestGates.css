@@ -40,14 +40,14 @@ body{
 }
 
 h1{
-    font-family: 'Boohong', cursive;
+    font-family: "Boohong", cursive;
     font-size: 10rem;
     color: rgb(234, 211, 8);
     text-align: center;
   }
 
   p {
-    font-family: 'Boohong', cursive;
+    font-family: "Boohong", cursive;
     font-size: 2.6rem;
     color: rgb(234, 211, 8);
     text-align: center;
@@ -163,7 +163,7 @@ h1{
 
 }
 p2 {
-    font-family: 'Boohong',  Georgia, 'Times New Roman', Times, serif;
+    font-family: "Boohong",  Georgia, 'Times New Roman', Times, serif;
     font-size: 1.2rem;
     color: rgb(234, 211, 8);
     text-align: center;
