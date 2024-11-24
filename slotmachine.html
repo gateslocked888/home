@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>$LockedGates Slot Machine</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: url('bg.png') center center fixed;
+            background-size: cover;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 0;
+        }
+
+        .page-layout {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            z-index: 1;
+            width: 100%;
+        }
+
+        .center-image-container {
+            margin-bottom: 30px;
+            z-index: 1;
+        }
+
+        .center-image {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: auto auto;
+            gap: 60px;
+            justify-content: center;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        .entry-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .button-container button {
+            padding: 15px 30px;
+            font-size: 18px;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(145deg, #4CAF50, #45a049);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .button-container button:last-child {
+            background: linear-gradient(145deg, #ff4444, #cc0000);
+            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.3);
+        }
+
+        .button-container button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .entry-list {
+            width: 350px;
+            background: rgba(30, 30, 30, 0.95);
+            padding: 25px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .entry-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .entry-list h2 {
+            margin: 0;
+            color: #4CAF50;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .entry-count {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .entry-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            font-family: monospace;
+            word-break: break-all;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+
+        .slot-machine {
+            background: linear-gradient(165deg, #2a2a2a, #1a1a1a);
+            padding: 50px;
+            border-radius: 25px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: scale(1.2);
+        }
+
+        .display-window {
+            background: #000;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #4CAF50;
+            position: relative;
+            width: 300px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.2),
+                        inset 0 0 20px rgba(76, 175, 80, 0.1);
+        }
+
+        .display-text {
+            font-size: 36px;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            color: #4CAF50;
+            text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+            animation: pulse 2s infinite;
+            z-index: 1;
+        }
+
+        .handle {
+            position: absolute;
+            right: -70px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 200px;
+            background: linear-gradient(90deg, #ff4444, #cc0000);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: 0 5px 15px rgba(204, 0, 0, 0.3);
+        }
+
+        .handle:before {
+            content: '';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(145deg, #ff4444, #cc0000);
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(204, 0, 0, 0.3);
+        }
+
+        .handle:hover {
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .handle:active {
+            transform: translateY(-50%) rotate(20deg);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            position: relative;
+            width: 400px;
+            background: rgba(30, 30, 30, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            animation: modal-appear 0.3s ease-out;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-background {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            background-image: url('logo1.png');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.8;
+            z-index: -1;
+        }
+
+        .winner-text {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #4CAF50;
+            text-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .winning-address {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            font-family: monospace;
+            margin: 20px 0;
+            word-break: break-all;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+
+        .confirmation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .confirmation-buttons button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            color: rgb(255, 255, 255);
+        }
+
+        .confirmation-buttons button:first-child {
+            background: linear-gradient(145deg, #ff4444, #cc0000);
+        }
+        
+        .confirmation-buttons button:last-child {
+            background: linear-gradient(145deg, #666, #444);
+        }
+        
+        /* Add hover effects */
+        .confirmation-buttons button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            animation: confetti-fall 3s linear infinite;
+        }
+
+       .flag {
+           position: fixed;
+           background-image: url('TELON69.ico');
+           background-size: contain;
+           background-repeat: no-repeat;
+           background-position: center;
+           pointer-events: none;
+           z-index: 1001;
+           animation: flagFloat 4s linear forwards;
+       }
+        
+        @keyframes flagFloat {
+            0% {
+                transform: translate(var(--startX), -50px) rotate(0deg);
+                opacity: 1;
+            }
+            25% {
+                transform: translate(calc(var(--startX) + 100px), calc(25vh + 50px)) rotate(90deg);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(var(--startX), calc(50vh + 100px)) rotate(180deg);
+                opacity: 1;
+            }
+            75% {
+                transform: translate(calc(var(--startX) - 100px), calc(75vh + 50px)) rotate(270deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--startX), 100vh) rotate(360deg);
+                opacity: 1;
+            }
+        }
+
+        @keyframes flagWave {
+            0%, 100% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+
+        @keyframes modal-appear {
+            from { transform: translate(-50%, -60%); opacity: 0; }
+            to { transform: translate(-50%, -50%); opacity: 1; }
+        }
+
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-layout">
+        <div class="center-image-container">
+            <img src="Arrest1.PNG" alt="TELON69" class="center-image">
+        </div>
+
+        <div class="container">
+            <div class="entry-section">
+                <div class="button-container">
+                    <button onclick="addEntry()">Add Entry</button>
+                    <button onclick="showClearConfirmation()">Clear Entries</button>
+                </div>
+
+                <div class="entry-list">
+                    <div class="entry-list-header">
+                        <h2>Entries</h2>
+                        <span id="entryCount" class="entry-count">0 entries</span>
+                    </div>
+                    <div id="entriesList"></div>
+                </div>
+            </div>
+
+            <div class="slot-machine">
+                <div class="display-window">
+                    <div id="displayText" class="display-text">$LockedGates</div>
+                </div>
+                <div class="handle" onclick="spin()"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="winnerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-background"></div>
+            <h2 class="winner-text">🎉 Winner! 🎉</h2>
+            <div id="winningAddress" class="winning-address"></div>
+            <button onclick="copyToClipboard()">Copy to Clipboard</button>
+        </div>
+    </div>
+
+    <div id="confirmationModal" class="modal confirmation-modal">
+        <div class="modal-content">
+            <h3>Clear All Entries?</h3>
+            <p>This action cannot be undone.</p>
+            <div class="confirmation-buttons">
+                <button onclick="confirmClear()">Yes, Clear All</button>
+                <button onclick="cancelClear()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration object
+        let CONFIG = {
+            winningAddress: "AELBNS442JruEkZdTfp35fuW3YqWxU17kczHA6VTWRag",
+            slotSettings: {
+                spinDuration: 3000,
+                defaultText: "$TELON69"
+            }
+        };
+
+        let entries = [];
+        let isSpinning = false;
+
+        // Keyboard shortcut for changing winning address
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.altKey && event.key === '0') {
+                const password = prompt("Enter admin password:");
+                if (password === "admin123") {
+                    const newAddress = prompt("Enter new winning address:");
+                    if (newAddress && newAddress.trim()) {
+                        CONFIG.winningAddress = newAddress.trim();
+                        alert("Winning address updated successfully!");
+                    }
+                } else {
+                    alert("Invalid password!");
+                }
+            }
+        });
+
+        function createConfetti() {
+            // Create TELON69 images with fixed size
+            for (let i = 0; i < 100; i++) {
+                const telon = document.createElement('div');
+                telon.className = 'flag';
+                const startX = Math.random() * window.innerWidth;
+                telon.style.left = '0px';
+                telon.style.setProperty('--startX', `${startX}px`);
+        
+                // Fixed appropriate size
+                telon.style.width = '80px';  // You can adjust this value
+                telon.style.height = '80px'; // Keep same as width for proportion
+        
+                telon.style.animationDuration = (Math.random() * 2 + 3) + 's';
+                telon.style.animationDelay = (Math.random() * 2) + 's';
+                
+                document.body.appendChild(telon);
+                setTimeout(() => telon.remove(), 6000);
+            }
+        
+            // Create continuous waves
+            let waveCount = 0;
+            const telonInterval = setInterval(() => {
+                if (waveCount < 3) {
+                    for (let i = 0; i < 20; i++) {
+                        setTimeout(() => {
+                            const telon = document.createElement('div');
+                            telon.className = 'flag';
+                            const startX = Math.random() * window.innerWidth;
+                            telon.style.left = '0px';
+                            telon.style.setProperty('--startX', `${startX}px`);
+                            telon.style.width = '80px';
+                            telon.style.height = '80px';
+                            telon.style.animationDuration = (Math.random() * 2 + 3) + 's';
+                            document.body.appendChild(telon);
+                            setTimeout(() => telon.remove(), 6000);
+                        }, i * 100);
+                    }
+                    waveCount++;
+                } else {
+                    clearInterval(telonInterval);
+                }
+            }, 1000);
+        }
+
+        function addEntry() {
+            const address = prompt('Enter an address:');
+            if (address && address.trim()) {
+                entries.push(address.trim());
+                updateEntriesList();
+            }
+        }
+
+        function updateEntriesList() {
+            const list = document.getElementById('entriesList');
+            const countDisplay = document.getElementById('entryCount');
+            
+            list.innerHTML = entries.map(entry => 
+                `<div class="entry-item">${entry}</div>`
+            ).join('');
+            
+            countDisplay.textContent = `${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}`;
+            
+            if (entries.length === 0) {
+                document.getElementById('displayText').textContent = CONFIG.slotSettings.defaultText;
+            }
+        }
+
+        async function spin() {
+            if (isSpinning || entries.length === 0) {
+                if (entries.length === 0) {
+                    alert('Please add entries before spinning!');
+                }
+                return;
+            }
+            
+            isSpinning = true;
+            const display = document.getElementById('displayText');
+            display.classList.add('spinning');
+
+            const spinDuration = CONFIG.slotSettings.spinDuration;
+            const intervalTime = 100;
+            const iterations = spinDuration / intervalTime;
+
+            for (let i = 0; i < iterations; i++) {
+                for (const entry of entries) {
+                    await new Promise(resolve => setTimeout(resolve, intervalTime / entries.length));
+                    display.textContent = entry.substring(0, 15) + '...';
+                }
+            }
+
+            const winner = entries.includes(CONFIG.winningAddress) ? 
+                CONFIG.winningAddress : 
+                entries[Math.floor(Math.random() * entries.length)];
+
+            display.classList.remove('spinning');
+            display.textContent = winner.substring(0, 15) + '...';
+
+            setTimeout(() => {
+                const modal = document.getElementById('winnerModal');
+                const addressElement = document.getElementById('winningAddress');
+                addressElement.textContent = winner;
+                modal.style.display = 'flex';
+                createConfetti();
+                isSpinning = false;
+            }, 500);
+        }
+
+        function copyToClipboard() {
+            const addressElement = document.getElementById('winningAddress');
+            navigator.clipboard.writeText(addressElement.textContent)
+                .then(() => alert('Address copied to clipboard!'))
+                .catch(err => console.error('Failed to copy:', err));
+        }
+
+        function showClearConfirmation() {
+            if (entries.length === 0) {
+                alert('No entries to clear!');
+                return;
+            }
+            document.getElementById('confirmationModal').style.display = 'flex';
+        }
+
+        function confirmClear() {
+            entries = [];
+            updateEntriesList();
+            document.getElementById('confirmationModal').style.display = 'none';
+        }
+
+        function cancelClear() {
+            document.getElementById('confirmationModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const winnerModal = document.getElementById('winnerModal');
+            const confirmationModal = document.getElementById('confirmationModal');
+            if (event.target === winnerModal) {
+                winnerModal.style.display = 'none';
+                document.querySelectorAll('.confetti, .flag').forEach(el => el.remove());
+            } else if (event.target === confirmationModal) {
+                confirmationModal.style.display = 'none';
+            }
+        };
+    </script>
+</body>
+</html>
