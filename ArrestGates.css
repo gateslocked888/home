@@ -41,17 +41,19 @@ body{
 
 h1{
     font-family: "Frijole", system-ui;
-    font-size: 10rem;
+    font-size: 7em;
     color: rgb(234, 211, 8);
     text-align: center;
   }
 
   p {
     font-family:"Frijole", system-ui;
-    font-size: 2.6rem;
+    font-size: 2.6em;
     color: rgb(234, 211, 8);
     text-align: center;
-  }
+       border-radius: 3px;
+    border-width: 3px;
+    padding: 5%;  }
    
 .btn {
     display: block;
@@ -161,12 +163,14 @@ h1{
     margin-right: auto;
 
 }
-p2 {
+footer {
     font-family: "Frijole", system-ui;
-    font-size: 1.2rem;
+    font-size: 1em;
     color: rgb(234, 211, 8);
     text-align: center;
-}
+     border-radius: 3px;
+    border-width: 3px;
+    padding: 5%;}
 video {
     margin-left: auto;
     margin-right: auto;
